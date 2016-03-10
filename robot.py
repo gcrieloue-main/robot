@@ -59,6 +59,7 @@ def phase2(source, r):
     process(text)
 
 def process(text):
+    hasResult = False
     for intent in engine.determine_intent(text):
         if intent and intent.get('confidence') > 0:
             print(json.dumps(intent, indent=4))
@@ -68,6 +69,9 @@ def process(text):
                     result = obj.process(intent)
                     if result != None:
                         print(result)
+                        hasResult = True
+    if not hasResult:
+        print('...')
 
 if __name__ == "__main__":
     for arg in sys.argv[1:]:
