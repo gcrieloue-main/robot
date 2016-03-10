@@ -1,1 +1,1 @@
-__all__ = ['weatherskill', 'shoppinglistskill', 'timerskill', 'calculatorskill','courtesyskill']
+__all__ = ['weatherskill', 'shoppinglistskill', 'timerskill', 'calculatorskill', 'courtesyskill', 'lightskill']
