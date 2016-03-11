@@ -10,6 +10,7 @@ import json
 import signal
 import sys
 import time
+import argparse
 
 def signal_handler(signal, frame):
     print('Robot say goodbye.')
@@ -74,13 +75,22 @@ def process(text):
         print('...')
 
 if __name__ == "__main__":
-    for arg in sys.argv[1:]:
+
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('texts', metavar='text', type=str, nargs='*',
+                    help='text to be evaluated')
+    parser.add_argument('-d', action='store_true', help='enable dynamic interpreter')
+
+    args = parser.parse_args()
+
+    for arg in args.texts:
         print(arg)
         process(arg)
 
-    while (True):
-        text = str(input("> "))
-        process(text)
+    if args.d:
+        while (True):
+            text = str(input("> "))
+            process(text)
 
     #with sr.Microphone() as source:
     #   r.adjust_for_ambient_noise(source) # listen for 1 second to calibrate the energy threshold for ambient noise levels
