@@ -38,7 +38,10 @@ class LightSkill(object):
         self.light_keyword = [
                 "allume",
                 "éteint",
-                "baisse"
+                "baisse",
+                "diminue",
+                "augmente",
+                "luminosité"
                 ]
 
         self.room_keyword = [
@@ -62,12 +65,17 @@ class LightSkill(object):
         engine.register_intent_parser(self.light_intent)
 
     def process(self, json):
+         room = json.get('RoomKeyword')
          if json.get('LightKeyword') == "allume":
-            self.bridge.set_light(json.get('RoomKeyword'), 'on', True)
-            return "J'allume '%s'" % json.get('RoomKeyword')
+            self.bridge.set_light(room, 'on', True)
+            return "J'allume '%s'" % room
          if json.get('LightKeyword') == "éteint":
-            self.bridge.set_light(json.get('RoomKeyword'), 'on', False)
-            return "J'éteins '%s'" % json.get('RoomKeyword')
+            self.bridge.set_light(room, 'on', False)
+            return "J'éteins '%s'" % room
+         if json.get('LightKeyword') == "baisse":
+             bri = self.bridge.get_light(room).get('state').get('bri')
+             self.bridge.set_light(room, 'bri', bri-20)
+             return "J'ai diminué la lumière dans le '%s'" % room
 
 if __name__ == "__main__":
     engine = IntentDeterminationEngine()
