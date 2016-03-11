@@ -1,4 +1,4 @@
-__author__ = 'seanfitz'
+__author__ = 'hellsdark'
 # coding=UTF-8
 """
 A sample program that uses multiple intents and disambiguates by
@@ -10,7 +10,7 @@ PYTHONPATH=. python examples/multi_intent_parser.py "play some music by the clas
 
 import json
 import sys
-import sympy
+from phue import Bridge
 from adapt.entity_tagger import EntityTagger
 from adapt.tools.text.tokenizer import EnglishTokenizer
 from adapt.tools.text.trie import Trie
@@ -23,18 +23,22 @@ trie = Trie()
 tagger = EntityTagger(trie, tokenizer)
 parser = Parser(tokenizer, tagger)
 
-# Ajoute xxx sur ma liste de courses
-# Je veux acheter xxx
+# Allume le salon
 
 class LightSkill(object):
 
     def __init__(self):
+
+        self.bridge = Bridge('192.168.1.10')
+        self.bridge.connect()
+
         self.intent = 'lightIntent'
 
         # define vocabulary
         self.light_keyword = [
                 "allume",
-                "éteins"
+                "éteint",
+                "baisse"
                 ]
 
         self.room_keyword = [
@@ -46,6 +50,7 @@ class LightSkill(object):
         self.light_intent = IntentBuilder(self.intent)\
                 .require("LightKeyword")\
                 .require("RoomKeyword")\
+                .optionally("NumericValue")\
                 .build()
 
     def register(self, engine):
@@ -53,12 +58,15 @@ class LightSkill(object):
             engine.register_entity(wk, "LightKeyword")
         for wk in self.room_keyword:
             engine.register_entity(wk, "RoomKeyword")
+        engine.register_regex_entity("(?P<NumericValue>\d+)")
         engine.register_intent_parser(self.light_intent)
 
     def process(self, json):
          if json.get('LightKeyword') == "allume":
+            self.bridge.set_light(json.get('RoomKeyword'), 'on', True)
             return "J'allume '%s'" % json.get('RoomKeyword')
-         if json.get('LightKeyword') == "éteins":
+         if json.get('LightKeyword') == "éteint":
+            self.bridge.set_light(json.get('RoomKeyword'), 'on', False)
             return "J'éteins '%s'" % json.get('RoomKeyword')
 
 if __name__ == "__main__":
